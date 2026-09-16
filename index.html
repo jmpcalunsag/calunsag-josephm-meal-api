@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Food List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            text-align: center;
+            background-color: #f4f9ff;
+            color: #29445c;
+        }
+
+        button, input {
+            padding: 6px;
+            margin: 4px;
+            border: 1px solid #b8d4ea;
+            border-radius: 4px;
+            background-color: white;
+            color: #29445c;
+        }
+
+        button {
+            background-color: #d9efff;
+            cursor: pointer;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 20px auto 0;
+            background-color: white;
+        }
+
+        th, td {
+            border: 1px solid #c7ddeb;
+            padding: 8px 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #dff2ff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Food List</h1>
+
+    <button onclick="loadFoods()">Load Food</button>
+    <br><br>
+    <label for="foodId">Food ID:</label>
+    <br>
+    <input id="foodId" type="text" inputmode="numeric">
+    <button onclick="searchFood()">Search</button>
+
+    <table id="foodTable" hidden>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>FOOD</th>
+                <th>PRICE</th>
+            </tr>
+        </thead>
+        <tbody id="foodList"></tbody>
+    </table>
+
+    <script>
+        async function loadFoods() {
+            
+            const response = await fetch("/api/foods");
+
+            const foods = await response.json();
+
+            const list = document.getElementById("foodList");
+
+            list.innerHTML = "";
+
+            foods.forEach(food => {
+                const row = document.createElement("tr");
+
+                row.innerHTML =
+                    "<td>" + food.id + "</td>" +
+                    "<td>" + food.name + "</td>" +
+                    "<td>" + food.price + "</td>";
+
+                list.appendChild(row);
+            });
+
+            document.getElementById("foodTable").hidden = false;
+        }
+
+        async function searchFood() {
+            const id = document.getElementById("foodId").value;
+
+            const response = await fetch("/api/foods/" + id);
+
+            if (!response.ok) {
+                document.getElementById("foodList").innerHTML = "";
+                return;
+            }
+
+            const food = await response.json();
+            const list = document.getElementById("foodList");
+
+            list.innerHTML = "";
+
+            {
+                const row = document.createElement("tr");
+
+                row.innerHTML =
+                    "<td>" + food.id + "</td>" +
+                    "<td>" + food.name + "</td>" +
+                    "<td>" + food.price + "</td>";
+
+                list.appendChild(row);
+            }
+
+            document.getElementById("foodTable").hidden = false;
+        }
+    </script>
+
+</body>
+</html>
